@@ -29,8 +29,7 @@
     (list (apply-expression expr c-marked))))
 
 (defn apply-expression [expr c]
-  (identity expr)
-  (identity c))
+  (identity expr))
 
 ;; (lambda (expression-str x)
 ;;          (let ((expression (read expression-str)))
