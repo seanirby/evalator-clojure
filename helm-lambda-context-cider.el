@@ -72,6 +72,7 @@ nrepl for evaluation.  If the args originated from an elispp "
                                                          ,candidates-marked
                                                          ,expression)
                                                        t)))
+         (setq cider-show-error-buffer nil)
            (if (equal nil (nrepl-dict-get result "err"))
                (read (nrepl-dict-get result "value"))
              candidates-all)))

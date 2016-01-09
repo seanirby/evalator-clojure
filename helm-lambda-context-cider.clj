@@ -46,12 +46,27 @@
   "Given an expression string, expr-str, and a candidate string,
   c-str, this function will first read each, substitute any special
   arguments in the expression, and then evaluate the expression."
-  [expr-str c-str]
-  (let [expr (read-string expr-str)
-        c    (read-string c-str)]
-    (eval (map #(substitute-special-arg % c) expr))))
+  [expr c]
+  (let [form (map #(substitute-special-arg % c) expr)]
+    (eval form)))
 
-(defn transform-candidates [c-all c-marked expr]
-  (if (nil? c-marked)
-    (make-candidates (map  #(apply-expression expr %) c-all))
-    (make-candidates (list (apply-expression expr c-marked)))))
+(defn transform-candidates [c-all c-marked expr-string]
+  (let [c-allv (vec c-all)
+        c-markedv (vec c-marked)
+        expr (read-string expr-string)]
+    (if (nil? c-marked)
+      (make-candidates (mapv #(apply-expression expr (read-string %)) c-allv))
+      (make-candidates (vector (apply-expression expr (mapv read-string c-markedv)))))))
+
+
+
+
+
+
+
+
+
+
+
+
+
