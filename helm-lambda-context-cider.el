@@ -64,7 +64,7 @@ nrepl for evaluation.  If the args originated from an elispp "
            (read (nrepl-dict-get result "value"))))
 
        :transform-candidates-try
-       (lambda (context candidates-all candidates-marked expression)
+       (lambda (candidates-all candidates-marked expression)
          ;; TODO need to find a way to ignore errors during this time and turn them back on without a buffer popping up
          (setq cider-show-error-buffer nil)
          (let ((result (helm-lambda-context-cider-eval "transform-candidates"
@@ -78,16 +78,12 @@ nrepl for evaluation.  If the args originated from an elispp "
              candidates-all)))
 
        :transform-candidates
-       (lambda (context candidates-all candidates-marked expression)
+       (lambda (candidates-all candidates-marked expression)
          (let ((result (helm-lambda-context-cider-eval "transform-candidates"
                                                        `(,candidates-all
                                                          ,candidates-marked
                                                          ,expression)
                                                        t)))
-           (read (nrepl-dict-get result "value"))))
-
-       ;; Not needed
-       :apply-expression
-       (lambda () nil)))
+           (read (nrepl-dict-get result "value"))))))
 
 (provide 'helm-lambda-context-cider)

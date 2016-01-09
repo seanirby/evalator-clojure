@@ -57,16 +57,3 @@
     (if (nil? c-marked)
       (make-candidates (mapv #(apply-expression expr (read-string %)) c-allv))
       (make-candidates (vector (apply-expression expr (mapv read-string c-markedv)))))))
-
-
-
-
-
-
-
-
-
-
-
-
-
