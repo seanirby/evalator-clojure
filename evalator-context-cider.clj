@@ -15,6 +15,15 @@
     (substitute-numbered-special-args c special-arg-str)
     (substitute-identity-special-args c special-arg-str)))
 
+(defn eval-expression [expr-str c special-arg-str]
+  (let [form-str (substitute-special-args expr-str c special-arg-str)]
+    (println form-str)
+    (eval (read-string form-str))))
+
+(defn make-equiv-expr [exprs special-arg-str]
+  (let [sub #(clojure.string/replace %2 special-arg-str %1)]
+    (reduce sub exprs)))
+
 (defn make-candidates [input mode initial?]
   "Possibly read and evaluate the arg INPUT before calling
   `make-candidates'"
@@ -29,11 +38,6 @@
 
           :else
           (list (pr-str data)))))
-
-(defn eval-expression [expr-str c special-arg-str]
-  (let [form-str (substitute-special-args expr-str c special-arg-str)]
-    (println form-str)
-    (eval (read-string form-str))))
 
 (defn transform-candidates [c-all c-marked expr-str mode special-arg-str]
   (let [c-allv (vec c-all)

@@ -65,6 +65,14 @@ nrepl for evaluation."
   (evalator-context-cider-inject)
   (evalator-context-cider-require))
 
+(defun evalator-context-cider-make-equiv-expr (exprs)
+  (let ((result (evalator-context-cider-eval "make-equiv-expr"
+                                             `(,exprs
+                                               ,(evalator-context-get-special-arg
+                                                 evalator-context-cider))
+                                             t)))
+    (read (nrepl-dict-get result "value"))))
+
 (defun evalator-context-cider-make-candidates (input mode initial-p)
   ;; TODO shouldn't do this
   (setq cider-show-error-buffer nil)
@@ -90,16 +98,19 @@ nrepl for evaluation."
    :name
    "cider"
 
-   :init
-   'evalator-context-cider-init
-
    :special-arg
    'evalator-context-cider-special-arg
+
+   :init
+   'evalator-context-cider-init
 
    :make-candidates
    'evalator-context-cider-make-candidates
 
    :transform-candidates
-   'evalator-context-cider-transform-candidates))
+   'evalator-context-cider-transform-candidates
+
+   :make-equiv-expr
+   'evalator-context-cider-make-equiv-expr))
 
 (provide 'evalator-context-cider)
