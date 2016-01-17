@@ -37,7 +37,11 @@ nrepl for evaluation."
   (let ((expression-list `(
                            "("
                            ,evalator-context-cider-ns "/" ,fname
-                           ,@(mapcar (lambda (s) (concat " " (if stringifyp (evalator-context-cider-to-arg-string s) s))) args)
+                           ,@(mapcar (lambda (s)
+                                       (concat " "
+                                               (if stringifyp
+                                                   (evalator-context-cider-to-arg-string s)
+                                                 s))) args)
                            ")"
                            )))
     (mapconcat 'identity expression-list "")))
