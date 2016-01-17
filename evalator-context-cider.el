@@ -23,6 +23,10 @@
   (cider-nrepl-sync-request:eval
    (concat "(require '(" evalator-context-cider-ns "))")))
 
+(defun evalator-context-cider-swap-special-arg ()
+  (let ((sa (evalator-context-get-special-arg evalator-context-cider)))
+    (evalator-context-cider-eval "swap-special-arg-str" `(,sa))))
+
 (defun evalator-context-cider-to-arg-string (arg)
   "Converts arg to its stringed representation so it can be evaluated
 by nrepl.  arg should only be a list, string, or nil."
@@ -60,13 +64,11 @@ nrepl for evaluation."
 
 (defun evalator-context-cider-init ()
   (evalator-context-cider-inject)
-  (evalator-context-cider-require))
+  (evalator-context-cider-require)
+  (evalator-context-cider-swap-special-arg))
 
 (defun evalator-context-cider-make-equiv-expr (exprs)
-  (let ((result (evalator-context-cider-eval "make-equiv-expr"
-                                             `(,exprs
-                                               ,(evalator-context-get-special-arg
-                                                 evalator-context-cider)))))
+  (let ((result (evalator-context-cider-eval "make-equiv-expr" `(,exprs))))
     (read (nrepl-dict-get result "value"))))
 
 (defun evalator-context-cider-make-candidates (input mode initial-p)
@@ -81,9 +83,7 @@ nrepl for evaluation."
                                              `(,candidates-all
                                                ,candidates-marked
                                                ,expression
-                                               ,mode
-                                               ,(evalator-context-get-special-arg
-                                                 evalator-context-cider)))))
+                                               ,mode))))
     (evalator-context-cider-result-or-error result)))
 
 (defvar evalator-context-cider
