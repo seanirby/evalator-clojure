@@ -17,7 +17,6 @@
 
 (defn eval-expression [expr-str c special-arg-str]
   (let [form-str (substitute-special-args expr-str c special-arg-str)]
-    (println form-str)
     (eval (read-string form-str))))
 
 (defn make-equiv-expr [exprs special-arg-str]
