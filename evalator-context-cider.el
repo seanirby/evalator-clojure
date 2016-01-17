@@ -30,7 +30,7 @@ by nrepl.  arg should only be a list, string, or nil."
         ((equal nil arg) "nil")
         (t (prin1-to-string arg))))
 
-(defun evalator-context-cider-make-expression-string (fname args stringifyp)
+(defun evalator-context-cider-make-expression-string (fname args)
   "Given a clojure function name, fname, and its args, this function
 will create a valid expression string so that it can be passed to
 nrepl for evaluation."
@@ -38,17 +38,14 @@ nrepl for evaluation."
                            "("
                            ,evalator-context-cider-ns "/" ,fname
                            ,@(mapcar (lambda (s)
-                                       (concat " "
-                                               (if stringifyp
-                                                   (evalator-context-cider-to-arg-string s)
-                                                 s))) args)
+                                       (concat " " (evalator-context-cider-to-arg-string s))) args)
                            ")"
                            )))
     (mapconcat 'identity expression-list "")))
 
-(defun evalator-context-cider-eval (fname args stringifyp)
+(defun evalator-context-cider-eval (fname args)
   "Used to evaluate one of the functions defined in 'evalator-context-cider.clj'"
-  (let ((expression (evalator-context-cider-make-expression-string fname args stringifyp)))
+  (let ((expression (evalator-context-cider-make-expression-string fname args)))
     (cider-nrepl-sync-request:eval expression)))
 
 (defun evalator-context-cider-result-or-error (result)
@@ -69,15 +66,14 @@ nrepl for evaluation."
   (let ((result (evalator-context-cider-eval "make-equiv-expr"
                                              `(,exprs
                                                ,(evalator-context-get-special-arg
-                                                 evalator-context-cider))
-                                             t)))
+                                                 evalator-context-cider)))))
     (read (nrepl-dict-get result "value"))))
 
 (defun evalator-context-cider-make-candidates (input mode initial-p)
   ;; TODO shouldn't do this
   (setq cider-show-error-buffer nil)
   (let* ((initial-p-sym (if initial-p 'true 'false))
-         (result (evalator-context-cider-eval "make-candidates" `(,input ,mode ,initial-p-sym) t)))
+         (result (evalator-context-cider-eval "make-candidates" `(,input ,mode ,initial-p-sym))))
     (evalator-context-cider-result-or-error result)))
 
 (defun evalator-context-cider-transform-candidates (candidates-all candidates-marked expression mode)
@@ -87,8 +83,7 @@ nrepl for evaluation."
                                                ,expression
                                                ,mode
                                                ,(evalator-context-get-special-arg
-                                                 evalator-context-cider))
-                                             t)))
+                                                 evalator-context-cider)))))
     (evalator-context-cider-result-or-error result)))
 
 (defvar evalator-context-cider
