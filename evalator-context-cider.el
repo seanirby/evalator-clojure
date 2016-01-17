@@ -53,9 +53,9 @@ nrepl for evaluation."
         (err (nrepl-dict-get result "err"))
         (out (nrepl-dict-get result "out")))
     (cond (val (read val))
-          (ex (signal 'e (list out)))
-          (err (signal 'e (list out)))
-          (t (signal 'e (list out))))))
+          (ex  (signal 'evalator-error (list ex out)))
+          (err (signal 'evalator-error (list err out)))
+          (t   (signal 'evalator-error (list out))))))
 
 (defun evalator-context-cider-init ()
   (evalator-context-cider-inject)
