@@ -3,6 +3,7 @@
 (require 'evalator-context)
 (require 'eieio)
 
+(defvar evalator-context-cider-special-arg nil)
 (defvar evalator-context-cider-ns "evalator-context-cider")
 (defvar evalator-context-cider-file-name load-file-name)
 
@@ -32,7 +33,7 @@ by nrepl.  arg should only be a list, string, or nil."
 (defun evalator-context-cider-make-expression-string (fname args stringifyp)
   "Given a clojure function name, fname, and its args, this function
 will create a valid expression string so that it can be passed to
-nrepl for evaluation.  If the args originated from an elispp "
+nrepl for evaluation."
   (let ((expression-list `(
                            "("
                            ,evalator-context-cider-ns "/" ,fname
@@ -46,44 +47,55 @@ nrepl for evaluation.  If the args originated from an elispp "
   (let ((expression (evalator-context-cider-make-expression-string fname args stringifyp)))
     (cider-nrepl-sync-request:eval expression)))
 
-(setq evalator-context-cider
-      (make-instance
-       'evalator-context
+(defun evalator-context-cider-result-or-error (result)
+  (let ((val (nrepl-dict-get result "value"))
+        (ex  (nrepl-dict-get result "ex"))
+        (err (nrepl-dict-get result "err"))
+        (out (nrepl-dict-get result "out")))
+    (cond (val (read val))
+          (ex (signal 'e (list out)))
+          (err (signal 'e (list out)))
+          (t (signal 'e (list out))))))
 
-       :name
-       "cider"
+(defun evalator-context-cider-init ()
+  (evalator-context-cider-inject)
+  (evalator-context-cider-require))
 
-       :init
-       (lambda ()
-         (evalator-context-cider-inject)
-         (evalator-context-cider-require))
+(defun evalator-context-cider-make-candidates (input mode initial-p)
+  ;; TODO shouldn't do this
+  (setq cider-show-error-buffer nil)
+  (let* ((initial-p-sym (if initial-p 'true 'false))
+         (result (evalator-context-cider-eval "make-candidates" `(,input ,mode ,initial-p-sym) t)))
+    (evalator-context-cider-result-or-error result)))
 
-       :make-candidates
-       (lambda (input)
-         (let ((result (evalator-context-cider-eval "make-candidates" `(,input) nil)))
-           (read (nrepl-dict-get result "value"))))
+(defun evalator-context-cider-transform-candidates (candidates-all candidates-marked expression mode)
+  (let ((result (evalator-context-cider-eval "transform-candidates"
+                                             `(,candidates-all
+                                               ,candidates-marked
+                                               ,expression
+                                               ,mode
+                                               ,(evalator-context-get-special-arg
+                                                 evalator-context-cider))
+                                             t)))
+    (evalator-context-cider-result-or-error result)))
 
-       :transform-candidates-try
-       (lambda (candidates-all candidates-marked expression)
-         ;; TODO need to find a way to ignore errors during this time and turn them back on without a buffer popping up
-         (setq cider-show-error-buffer nil)
-         (let ((result (evalator-context-cider-eval "transform-candidates"
-                                                       `(,candidates-all
-                                                         ,candidates-marked
-                                                         ,expression)
-                                                       t)))
-         (setq cider-show-error-buffer nil)
-           (if (equal nil (nrepl-dict-get result "err"))
-               (read (nrepl-dict-get result "value"))
-             candidates-all)))
+(defvar evalator-context-cider
+  (make-instance
+   'evalator-context
 
-       :transform-candidates
-       (lambda (candidates-all candidates-marked expression)
-         (let ((result (evalator-context-cider-eval "transform-candidates"
-                                                       `(,candidates-all
-                                                         ,candidates-marked
-                                                         ,expression)
-                                                       t)))
-           (read (nrepl-dict-get result "value"))))))
+   :name
+   "cider"
+
+   :init
+   'evalator-context-cider-init
+
+   :special-arg
+   'evalator-context-cider-special-arg
+
+   :make-candidates
+   'evalator-context-cider-make-candidates
+
+   :transform-candidates
+   'evalator-context-cider-transform-candidates))
 
 (provide 'evalator-context-cider)

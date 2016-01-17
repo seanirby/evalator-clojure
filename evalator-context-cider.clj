@@ -1,59 +1,60 @@
-(ns helm-lambda-context-cider)
+(ns evalator-context-cider)
 
-(def special-arg-identity "%")
-(def special-arg-nth #"%[0-9]")
+(defn special-arg-to-index [special-arg-str]
+  (Integer. (clojure.string/join "" (rest special-arg-str))))
 
-(defn wrap-string [s1 s2]
-  "Add s1 to the beginning and end of s2"
-  (str s1 s2 s1))
+(defn substitute-numbered-special-args [expr-str c special-arg-str]
+  (let [pattern (re-pattern (format "%s[0-9]+" special-arg-str))]
+    (clojure.string/replace expr-str pattern #(pr-str (nth c (special-arg-to-index %))))))
 
-(defn substitute-special-arg [sym single-or-coll]
-  "Substitutes the special args defined by the special-arg-* vars with
-  their proper values. For example, % refers to single-or-coll and %0
-  refers to the 0th element in single-or-coll"
-  (let [sym-str (str sym)]
-    (cond (= sym (symbol special-arg-identity))
-          single-or-coll
-          
-          (not (nil? (re-matches special-arg-nth sym-str)))
-          (single-or-coll (Character/getNumericValue (last sym-str)))
-          
-          :else sym)))
+(defn substitute-identity-special-args [expr-str c special-arg-str]
+  (clojure.string/replace expr-str special-arg-str (pr-str c)))
 
-(defmulti make-candidates
-  "Converts data so it can be used as a set of candidates in helm. In
-  other words, a list of the stringed representation of data."
-  (fn [data]
-    (cond
-      (map? data) :default
-      (coll? data) :coll
-      (or (char? data) (string? data)) :string
-      :else :default)))
+(defn substitute-special-args [expr-str c special-arg-str]
+  (-> expr-str
+    (substitute-numbered-special-args c special-arg-str)
+    (substitute-identity-special-args c special-arg-str)))
 
-(defmethod make-candidates :coll
-  [coll]
-  (map #(if (string? %) (wrap-string "\"" %) (str %)) coll))
+(defn make-candidates [input mode initial?]
+  "Possibly read and evaluate the arg INPUT before calling
+  `make-candidates'"
+  (let [data (if initial? (eval (read-string input)) input)]
+    (cond (= :explicit mode)
+          (if initial?
+            (list (pr-str data))
+            (list (pr-str (first data))))
 
-(defmethod make-candidates :string
-  [s]
-  (list (wrap-string "\"" s)))
+          (and (coll? data) (not (map? data)))
+          (map pr-str data)
 
-(defmethod make-candidates :default
-  [data]
-  (list data))
+          :else
+          (list (pr-str data)))))
 
-(defn apply-expression
-  "Given an expression string, expr-str, and a candidate string,
-  c-str, this function will first read each, substitute any special
-  arguments in the expression, and then evaluate the expression."
-  [expr c]
-  (let [form (map #(substitute-special-arg % c) expr)]
-    (eval form)))
+(defn eval-expression [expr-str c special-arg-str]
+  (let [form-str (substitute-special-args expr-str c special-arg-str)]
+    (println form-str)
+    (eval (read-string form-str))))
 
-(defn transform-candidates [c-all c-marked expr-string]
+(defn transform-candidates [c-all c-marked expr-str mode special-arg-str]
   (let [c-allv (vec c-all)
-        c-markedv (vec c-marked)
-        expr (read-string expr-string)]
+        c-markedv (vec c-marked)]
     (if (nil? c-marked)
-      (make-candidates (mapv #(apply-expression expr (read-string %)) c-allv))
-      (make-candidates (vector (apply-expression expr (mapv read-string c-markedv)))))))
+      (make-candidates
+        (mapv #(eval-expression expr-str (read-string %) special-arg-str) c-allv)
+        mode
+        false)
+      
+      (make-candidates
+        (vector (eval-expression expr-str (mapv read-string c-markedv) special-arg-str))
+        mode
+        false))))
+
+
+
+
+
+
+
+
+
+
