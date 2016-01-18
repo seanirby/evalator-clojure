@@ -1,3 +1,35 @@
+;;; evalator-context-cider.el --- CIDER evaluation context for evalator
+;; 
+;; Copyright © , Sean Irby
+;; Author: Sean Irby
+;; Maintainer: Sean Irby <sean.t.irby@gmail.com>
+;; URL: http://www.github.com/seanirby/evalator
+;; Version: 0.0.1
+;; Keywords: languages, clojure, cider, helm
+;; Package-Requires: ((evalator "0.0.1"))
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or (at
+;; your option) any later version.
+;; 
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;; 
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 
+;;; This file is not a part of GNU Emacs
+;; 
+;;; Commentary:
+;; 
+;;; Code:
+
+
 (require 'cider)
 (require 'evalator-utils)
 (require 'evalator-context)
@@ -6,6 +38,28 @@
 (defvar evalator-context-cider-special-arg nil)
 (defvar evalator-context-cider-ns "evalator-context-cider")
 (defvar evalator-context-cider-file-name load-file-name)
+
+(defvar evalator-context-cider
+  (make-instance
+   'evalator-context
+
+   :name
+   "cider"
+
+   :special-arg
+   'evalator-context-cider-special-arg
+
+   :init
+   'evalator-context-cider-init
+
+   :make-candidates
+   'evalator-context-cider-make-candidates
+
+   :transform-candidates
+   'evalator-context-cider-transform-candidates
+
+   :make-equiv-expr
+   'evalator-context-cider-make-equiv-expr))
 
 (defun evalator-context-cider-inject ()
   "Makes evalator-context-cider namespace available."
@@ -86,26 +140,7 @@ nrepl for evaluation."
                                                ,mode))))
     (evalator-context-cider-result-or-error result)))
 
-(defvar evalator-context-cider
-  (make-instance
-   'evalator-context
-
-   :name
-   "cider"
-
-   :special-arg
-   'evalator-context-cider-special-arg
-
-   :init
-   'evalator-context-cider-init
-
-   :make-candidates
-   'evalator-context-cider-make-candidates
-
-   :transform-candidates
-   'evalator-context-cider-transform-candidates
-
-   :make-equiv-expr
-   'evalator-context-cider-make-equiv-expr))
-
 (provide 'evalator-context-cider)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; evalator-context-cider.el ends here
