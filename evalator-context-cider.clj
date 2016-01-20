@@ -44,16 +44,14 @@
           :else
           (list (pr-str data)))))
 
-(defn transform-candidates [c-all c-marked expr-str mode]
-  (let [c-allv (vec c-all)
-        c-markedv (vec c-marked)]
-    (if (nil? c-marked)
+(defn transform-candidates [cands expr-str mode collect?]
+  (let [cands-v (vec cands)]
+    (if collect?
       (make-candidates
-        (mapv #(eval-expression expr-str (read-string %)) c-allv)
+        (vector (eval-expression expr-str (mapv read-string cands-v)))
         mode
         false)
-      
       (make-candidates
-        (vector (eval-expression expr-str (mapv read-string)))
+        (mapv #(eval-expression expr-str (read-string %)) cands-v)
         mode
         false))))
