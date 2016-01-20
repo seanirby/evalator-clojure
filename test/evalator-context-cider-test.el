@@ -58,6 +58,8 @@
 (ert-deftest evalator-context-cider-to-arg-string-test ()
   (should (equal "'(\"cand-1\" \"cand-2\" \"cand-3\")"
                  (evalator-context-cider-to-arg-string '("cand-1" "cand-2" "cand-3"))))
+  (should (equal "true"
+                 (evalator-context-cider-to-arg-string t)))
   (should (equal "nil"
                  (evalator-context-cider-to-arg-string nil)))
   (should (equal ":explicit"

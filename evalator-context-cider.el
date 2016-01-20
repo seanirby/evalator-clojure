@@ -85,6 +85,7 @@
   "Converts arg to its stringed representation so it can be evaluated
 by nrepl.  arg should only be a list, string, or nil."
   (cond ((consp arg) (concat "'" (prin1-to-string arg)))
+        ((equal t arg) "true")
         ((equal nil arg) "nil")
         (t (prin1-to-string arg))))
 
