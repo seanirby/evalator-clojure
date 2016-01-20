@@ -126,8 +126,7 @@ nrepl for evaluation."
     (read (nrepl-dict-get result "value"))))
 
 (defun evalator-context-cider-make-candidates (input mode initial-p)
-  ;; TODO shouldn't do this
-  (setq cider-show-error-buffer nil)
+  ""
   (let* ((initial-p-sym (if initial-p 'true 'false))
          (result (evalator-context-cider-eval "make-candidates" `(,input ,mode ,initial-p-sym))))
     (evalator-context-cider-result-or-error result)))
