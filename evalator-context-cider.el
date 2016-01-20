@@ -132,12 +132,13 @@ nrepl for evaluation."
          (result (evalator-context-cider-eval "make-candidates" `(,input ,mode ,initial-p-sym))))
     (evalator-context-cider-result-or-error result)))
 
-(defun evalator-context-cider-transform-candidates (candidates-all candidates-marked expression mode)
+(defun evalator-context-cider-transform-candidates (cands expr-str mode &optional collect-p)
+  ""
   (let ((result (evalator-context-cider-eval "transform-candidates"
-                                             `(,candidates-all
-                                               ,candidates-marked
-                                               ,expression
-                                               ,mode))))
+                                             `(,cands
+                                               ,expr-str
+                                               ,mode
+                                               ,collect-p))))
     (evalator-context-cider-result-or-error result)))
 
 (provide 'evalator-context-cider)

@@ -111,11 +111,11 @@
 (ert-deftest evalator-context-cider-transform-candidates-test ()
   (with-mock
    (mock (evalator-context-cider-eval "transform-candidates" '(("foo")
-                                                               nil
                                                                "(concat Ⓔ \"bar\")"
-                                                               :explicit)))
+                                                               :explicit
+                                                               nil)))
    (mock (evalator-context-cider-result-or-error *) => t)
-   (evalator-context-cider-transform-candidates '("foo") nil "(concat Ⓔ \"bar\")" :explicit)))
+   (evalator-context-cider-transform-candidates '("foo") "(concat Ⓔ \"bar\")" :explicit nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; evalator-context-cider-test.el ends here

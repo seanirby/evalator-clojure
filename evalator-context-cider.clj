@@ -1,5 +1,6 @@
 (ns evalator-context-cider)
 
+;; value is swapped when evanaltor session starts
 (def special-arg-str (atom nil))
 
 (defn swap-special-arg-str [str]
