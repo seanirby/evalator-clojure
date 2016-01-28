@@ -4,6 +4,7 @@
 (def special-arg-str (atom nil))
 
 (defn swap-special-arg-str [str]
+  "Swaps special-arg-str atom with STR"
   (swap! special-arg-str #(identity %2) str))
 
 (defn special-arg-to-index []
@@ -30,8 +31,7 @@
     (reduce sub exprs)))
 
 (defn make-candidates [input mode initial?]
-  "Possibly read and evaluate the arg INPUT before calling
-  `make-candidates'"
+  "See slot documentation in evalator-context.el in evalator package."
   (let [data (if initial? (eval (read-string input)) input)]
     (cond (= :explicit mode)
           (if initial?
@@ -45,6 +45,7 @@
           (list (pr-str data)))))
 
 (defn transform-candidates [cands expr-str mode collect?]
+  "See slot documentation in evalator-context.el in evalator package."
   (let [cands-v (vec cands)]
     (if collect?
       (make-candidates
