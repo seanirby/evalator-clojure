@@ -1,4 +1,5 @@
-(ns evalator-context-cider)
+(ns evalator-context-cider
+  (:require [clojure.string :as s :refer [replace join]]))
 
 ;; value is swapped when evalator session starts
 (def special-arg-str (atom nil))
@@ -7,27 +8,52 @@
   "Swaps special-arg-str atom with STR"
   (swap! special-arg-str #(identity %2) str))
 
-(defn special-arg-to-index []
-  (Integer. (clojure.string/join "" (rest @special-arg-str))))
+(defn numbered-arg-pattern
+   "Return the regex pattern used to match a numbered special arg like
+   \" ⒺN \".  If QUOTE? is true then a pattern is returned that can also
+   match a quoted numbered special arg like \" 'ⒺN \"."
+  ([]
+   (numbered-arg-pattern false))
+  ([quote?]
+   (let [frmt (if quote? "'?%s([0-9]+)" "%s([0-9]+)")]
+     (re-pattern (format frmt @special-arg-str)))))
 
-(defn substitute-numbered-special-args [expr-str c]
-  (let [pattern (re-pattern (format "%s[0-9]+" @special-arg-str))]
-    (clojure.string/replace expr-str pattern #(pr-str (nth c (special-arg-to-index))))))
+(defn identity-arg-pattern
+  "Return the regex pattern used to match identity special args.  If
+   QUOTE? is true then a pattern is returned that can also match a
+   quoted identity special arg like \" 'Ⓔ \"."
+  ([]
+   (identity-arg-pattern false))
+  ([quote?]
+   (let [frmt (if quote? "'?%s" "%s")]
+     (re-pattern (format frmt @special-arg-str)))))
 
-(defn substitute-identity-special-args [expr-str c]
-  (clojure.string/replace expr-str @special-arg-str (pr-str c)))
+(defn subst-numbered-special-args [expr-str c]
+  "Substitute any special args of the form `ⒺN' in EXPR-STR with the
+  Nth element in C."
+  (s/replace expr-str (numbered-arg-pattern) #(pr-str (nth c (Integer. (last %))))))
 
-(defn substitute-special-args [expr-str c]
+(defn subst-identity-special-args [expr-str c]
+  "Substitute any special args of the form \"Ⓔ\" in EXPR-STR with C."
+  (s/replace expr-str (identity-arg-pattern) (pr-str c)))
+
+(defn subst-special-args [expr-str c]
+  "Substitute any special args in EXPR-STR.  Identity special args
+   like \"Ⓔ\" are substituted with the value of C.  Numbered special
+   args like \"ⒺN\" are substituted with the Nth element in C."
   (-> expr-str
-    (substitute-numbered-special-args c)
-    (substitute-identity-special-args c)))
+    (subst-numbered-special-args c)
+    (subst-identity-special-args c)))
 
 (defn eval-expression [expr-str]
   "Evaluate the expression string, EXPR-STR."
   (eval (read-string expr-str)))
 
 (defn make-equiv-expr [exprs]
-  (let [sub #(clojure.string/replace %2 @special-arg-str %1)]
+  "See slot documentation in evalator-context.el in evalator package."
+  (let [sub-numbered-args #(s/replace %2 (numbered-arg-pattern true) (format "(nth %s $1)" %1))
+        sub-identity-args #(s/replace %2 (identity-arg-pattern true) %1)
+        sub (fn [e1 e2] (sub-identity-args e1 (sub-numbered-args e1 e2)))]
     (reduce sub exprs)))
 
 (defn make-candidates [input mode initial?]
