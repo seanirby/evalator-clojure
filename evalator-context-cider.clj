@@ -21,9 +21,9 @@
     (substitute-numbered-special-args c)
     (substitute-identity-special-args c)))
 
-(defn eval-expression [expr-str c]
-  (let [form-str (substitute-special-args expr-str c)]
-    (eval (read-string form-str))))
+(defn eval-expression [expr-str]
+  "Evaluate the expression string, EXPR-STR."
+  (eval (read-string expr-str)))
 
 (defn make-equiv-expr [exprs]
   (let [sub #(clojure.string/replace %2 @special-arg-str %1)]
@@ -48,10 +48,10 @@
   (let [cands-v (vec cands)]
     (if collect?
       (make-candidates
-        (vector (eval-expression expr-str (mapv read-string cands-v)))
+        (vector (eval-expression (subst-special-args expr-str (mapv read-string cands-v))))
         mode
         false)
       (make-candidates
-        (mapv #(eval-expression expr-str (read-string %)) cands-v)
+        (mapv #(eval-expression (subst-special-args expr-str (read-string %))) cands-v)
         mode
         false))))
