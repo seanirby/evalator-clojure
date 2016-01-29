@@ -9,9 +9,9 @@
   (swap! special-arg-str #(identity %2) str))
 
 (defn numbered-arg-pattern
-   "Return the regex pattern used to match a numbered special arg like
+  "Return the regex pattern used to match a numbered special arg like
    \" ⒺN \".  If QUOTE? is true then a pattern is returned that can also
-   match a quoted numbered special arg like \" 'ⒺN \"."
+   match a quoted numbered special arg like \"'ⒺN\"."
   ([]
    (numbered-arg-pattern false))
   ([quote?]
@@ -21,7 +21,7 @@
 (defn identity-arg-pattern
   "Return the regex pattern used to match identity special args.  If
    QUOTE? is true then a pattern is returned that can also match a
-   quoted identity special arg like \" 'Ⓔ \"."
+   quoted identity special arg like \"'Ⓔ\"."
   ([]
    (identity-arg-pattern false))
   ([quote?]
@@ -29,7 +29,7 @@
      (re-pattern (format frmt @special-arg-str)))))
 
 (defn subst-numbered-special-args [expr-str c]
-  "Substitute any special args of the form `ⒺN' in EXPR-STR with the
+  "Substitute any special args of the form \"ⒺN\" in EXPR-STR with the
   Nth element in C."
   (s/replace expr-str (numbered-arg-pattern) #(pr-str (nth c (Integer. (last %))))))
 
@@ -56,29 +56,23 @@
         sub (fn [e1 e2] (sub-identity-args e1 (sub-numbered-args e1 e2)))]
     (reduce sub exprs)))
 
-(defn make-candidates [input mode initial?]
+(defn make-candidates [input mode]
   "See slot documentation in evalator-context.el in evalator package."
-  (let [data (if initial? (eval (read-string input)) input)]
+  (let [data (eval (read-string input))]
     (cond (= :explicit mode)
-          (if initial?
-            (list (pr-str data))
-            (list (pr-str (first data))))
+          (list (pr-str data))
 
-          (and (coll? data) (not (map? data)))
+          (sequential? data)
           (map pr-str data)
 
           :else
           (list (pr-str data)))))
 
-(defn transform-candidates [cands expr-str mode collect?]
+(defn transform-candidates [cands expr-str collect?]
   "See slot documentation in evalator-context.el in evalator package."
   (let [cands-v (vec cands)]
-    (if collect?
-      (make-candidates
-        (vector (eval-expression (subst-special-args expr-str (mapv read-string cands-v))))
-        mode
-        false)
-      (make-candidates
-        (mapv #(eval-expression (subst-special-args expr-str (read-string %))) cands-v)
-        mode
-        false))))
+    (map pr-str
+      (if collect?
+        (list (eval-expression (subst-special-args expr-str (mapv read-string cands-v))))
+        (map #(eval-expression (subst-special-args expr-str (read-string %))) cands-v)))))
+

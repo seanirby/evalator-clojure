@@ -109,20 +109,17 @@
 
 (ert-deftest evalator-context-cider-make-candidates-test ()
   (with-mock
-   (mock (evalator-context-cider-eval "make-candidates" '("(vector 1 2 3)"
-                                                          nil
-                                                          true)))
+   (mock (evalator-context-cider-eval "make-candidates" '("(vector 1 2 3)" nil)))
    (mock (evalator-context-cider-result-or-error *) => t)
-   (evalator-context-cider-make-candidates "(vector 1 2 3)" nil t)))
+   (evalator-context-cider-make-candidates "(vector 1 2 3)" nil)))
 
 (ert-deftest evalator-context-cider-transform-candidates-test ()
   (with-mock
    (mock (evalator-context-cider-eval "transform-candidates" '(("foo")
                                                                "(concat Ⓔ \"bar\")"
-                                                               :explicit
                                                                nil)))
    (mock (evalator-context-cider-result-or-error *) => t)
-   (evalator-context-cider-transform-candidates '("foo") "(concat Ⓔ \"bar\")" :explicit nil)))
+   (evalator-context-cider-transform-candidates '("foo") "(concat Ⓔ \"bar\")" nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; evalator-context-cider-test.el ends here

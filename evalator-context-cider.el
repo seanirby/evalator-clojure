@@ -131,22 +131,19 @@ nrepl for evaluation."
       nil)))
 
 (defun evalator-context-cider-make-equiv-expr (exprs)
+  "See slot documentation in evalator-context.el in evalator package."
   (let ((result (evalator-context-cider-eval "make-equiv-expr" `(,exprs))))
     (read (nrepl-dict-get result "value"))))
 
-(defun evalator-context-cider-make-candidates (input mode initial-p)
-  ""
-  (let* ((initial-p-sym (if initial-p 'true 'false))
-         (result (evalator-context-cider-eval "make-candidates" `(,input ,mode ,initial-p-sym))))
+(defun evalator-context-cider-make-candidates (input mode)
+  "See slot documentation in evalator-context.el in evalator package."
+  (let* ((result (evalator-context-cider-eval "make-candidates" `(,input ,mode))))
     (evalator-context-cider-result-or-error result)))
 
-(defun evalator-context-cider-transform-candidates (cands expr-str mode &optional collect-p)
-  ""
+(defun evalator-context-cider-transform-candidates (cands expr-str collect-p)
+  "See slot documentation in evalator-context.el in evalator package."
   (let ((result (evalator-context-cider-eval "transform-candidates"
-                                             `(,cands
-                                               ,expr-str
-                                               ,mode
-                                               ,collect-p))))
+                                             `(,cands ,expr-str ,collect-p))))
     (evalator-context-cider-result-or-error result)))
 
 (provide 'evalator-context-cider)
