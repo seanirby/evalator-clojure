@@ -70,7 +70,7 @@
       (expand-file-name "evalator-context-cider.clj"
                         (file-name-directory
                          (or evalator-context-cider-file-name buffer-file-name)))))
-    (cider-nrepl-sync-request:eval (concat "(ns '" ns-curr ")"))))
+    (cider-nrepl-sync-request:eval (concat "(ns " ns-curr ")"))))
 
 (defun evalator-context-cider-require ()
   "Requires evalator-context-cider-ns in current ns fully-qualified."

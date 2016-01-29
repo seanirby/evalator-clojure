@@ -40,7 +40,7 @@
           (with-mock
            (stub cider-current-ns => "foo.core")
            (stub evalator-utils-get-file-string => "evalator-context-cider.clj contents")
-           (should (equal "(in-ns 'foo.core)"
+           (should (equal "(ns foo.core)"
                           (evalator-context-cider-inject))))))
 
 (ert-deftest evalator-context-cider-require-test ()
@@ -93,7 +93,12 @@
    (mock (evalator-context-cider-inject) :times 1)
    (mock (evalator-context-cider-require) :times 1)
    (mock (evalator-context-cider-swap-special-arg) :times 1)
-   (evalator-context-cider-init)))
+   (let ((cider-mode t))
+     (evalator-context-cider-init))
+   (let ((cider-mode nil))
+     (mock (message *))
+     (equal nil
+            (evalator-context-cider-init)))))
 
 (ert-deftest evalator-context-cider-make-equiv-expr-test ()
   (with-mock
