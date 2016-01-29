@@ -108,19 +108,27 @@ nrepl for evaluation."
     (cider-nrepl-sync-request:eval expression)))
 
 (defun evalator-context-cider-result-or-error (result)
-  (let ((val (nrepl-dict-get result "value"))
-        (ex  (nrepl-dict-get result "ex"))
-        (err (nrepl-dict-get result "err"))
-        (out (nrepl-dict-get result "out")))
-    (cond (val (read val))
-          (ex  (signal 'evalator-error (list ex out)))
-          (err (signal 'evalator-error (list err out)))
-          (t   (signal 'evalator-error (list out))))))
+  ""
+  (let ((val        (nrepl-dict-get result "value"))
+        (error-str  (ansi-color-apply (or (nrepl-dict-get result "ex")
+                                          (nrepl-dict-get result "err")
+                                          "")))
+        (out-str    (ansi-color-apply (or (nrepl-dict-get result "out") ""))))
+    (if val
+        (read val)
+      (signal 'evalator-error (list error-str out-str)))))
 
 (defun evalator-context-cider-init ()
-  (evalator-context-cider-inject)
-  (evalator-context-cider-require)
-  (evalator-context-cider-swap-special-arg))
+  ""
+  (if cider-mode
+      (progn
+        (evalator-context-cider-inject)
+        (evalator-context-cider-require)
+        (evalator-context-cider-swap-special-arg))
+    (progn
+      (message (concat "CIDER must be running before evalator can be started.\n"
+                       "Run 'M-x cider-jack-in' to start a CIDER server for this project and try again."))
+      nil)))
 
 (defun evalator-context-cider-make-equiv-expr (exprs)
   (let ((result (evalator-context-cider-eval "make-equiv-expr" `(,exprs))))
