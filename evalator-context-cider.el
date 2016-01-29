@@ -62,7 +62,7 @@
    'evalator-context-cider-make-equiv-expr))
 
 (defun evalator-context-cider-inject ()
-  "Makes evalator-context-cider namespace available."
+  "Make evalator-context-cider namespace available."
   ;; Remember current ns so it can be switched back to after injection
   (let* ((ns-curr (cider-current-ns)))
     (cider-nrepl-sync-request:eval
