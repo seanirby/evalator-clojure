@@ -1,12 +1,12 @@
-;;; evalator-context-cider.el --- CIDER evaluation context for evalator
+;;; evalator-context-cider.el --- Clojure evaluation context for evalator via CIDER.
 ;; 
 ;; Copyright © , Sean Irby
 ;; Author: Sean Irby
 ;; Maintainer: Sean Irby <sean.t.irby@gmail.com>
-;; URL: http://www.github.com/seanirby/evalator
-;; Version: 0.0.1
+;; URL: http://www.github.com/seanirby/evalator-context-cider
+;; Version: 1.0.0
 ;; Keywords: languages, clojure, cider, helm
-;; Package-Requires: ((evalator "0.0.1"))
+;; Package-Requires: ((cider)(evalator))
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -83,17 +83,16 @@ Value is swapped with SPECIAL-ARG-STR."
   (evalator-context-cider-eval "swap-special-arg-str" `(,special-arg-str)))
 
 (defun evalator-context-cider-to-arg-string (arg)
-  "Converts arg to its stringed representation so it can be evaluated
-by nrepl.  arg should only be a list, string, or nil."
+  "Convert arg to its string representation.
+ARG should only be a list, string, t, or nil."
   (cond ((consp arg) (concat "'" (prin1-to-string arg)))
         ((equal t arg) "true")
         ((equal nil arg) "nil")
         (t (prin1-to-string arg))))
 
 (defun evalator-context-cider-make-expression-string (fname args)
-  "Given a clojure function name, fname, and its args, this function
-will create a valid expression string so that it can be passed to
-nrepl for evaluation."
+  "Create an expression string to pass to nrepl.
+Accepts a clojure function name, FNAME, and its arguments, ARGS."
   (let ((expression-list `(
                            "("
                            ,evalator-context-cider-ns "/" ,fname
@@ -104,12 +103,16 @@ nrepl for evaluation."
     (mapconcat 'identity expression-list "")))
 
 (defun evalator-context-cider-eval (fname args)
-  "Used to evaluate one of the functions defined in 'evalator-context-cider.clj'"
+  "Evaluate a clojure function.
+Accepts a clojure function name, FNAME, and its arguments, ARGS"
   (let ((expression (evalator-context-cider-make-expression-string fname args)))
     (cider-nrepl-sync-request:eval expression)))
 
 (defun evalator-context-cider-result-or-error (result)
-  ""
+  "Check the result of an nrepl evaluation.
+Accepts an nrepl evaluation result, RESULT.  If the result was
+successful read its value and return it.  If an error occured, signal
+an error with the error string contained within RESULT."
   (let ((val        (nrepl-dict-get result "value"))
         (error-str  (ansi-color-apply (or (nrepl-dict-get result "ex")
                                           (nrepl-dict-get result "err")
