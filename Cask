@@ -6,8 +6,7 @@
 (files "*.el" "*clj")
 
 (depends-on "cider")
-;; TODO Currently linking evalator from local filesystem using `cask link PACKAGE SOURCE' command
-;; Need to pull from MELPA when available
+(depends-on "evalator")
 
 (development
  (depends-on "f")
