@@ -53,7 +53,7 @@
 (ert-deftest evalator-context-cider-swap-special-arg-test ()
   (with-mock
    (mock (evalator-context-cider-eval "swap-special-arg-str" '("Ⓔ")) => t)
-   (evalator-context-cider-swap-special-arg)))
+   (evalator-context-cider-swap-special-arg "Ⓔ")))
 
 (ert-deftest evalator-context-cider-to-arg-string-test ()
   (should (equal "'(\"cand-1\" \"cand-2\" \"cand-3\")"
@@ -92,7 +92,7 @@
   (with-mock
    (mock (evalator-context-cider-inject) :times 1)
    (mock (evalator-context-cider-require) :times 1)
-   (mock (evalator-context-cider-swap-special-arg) :times 1)
+   (mock (evalator-context-cider-swap-special-arg *) :times 1)
    (let ((cider-mode t))
      (evalator-context-cider-init))
    (let ((cider-mode nil))

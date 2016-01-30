@@ -77,9 +77,10 @@
   (cider-nrepl-sync-request:eval
    (concat "(require '(" evalator-context-cider-ns "))")))
 
-(defun evalator-context-cider-swap-special-arg ()
-  (let ((sa (evalator-context-get-special-arg evalator-context-cider)))
-    (evalator-context-cider-eval "swap-special-arg-str" `(,sa))))
+(defun evalator-context-cider-swap-special-arg (special-arg-str)
+  "Swaps the special arg defined in evalator-context-cider.clj.
+Value is swapped with SPECIAL-ARG-STR."
+  (evalator-context-cider-eval "swap-special-arg-str" `(,special-arg-str)))
 
 (defun evalator-context-cider-to-arg-string (arg)
   "Converts arg to its stringed representation so it can be evaluated
@@ -119,12 +120,12 @@ nrepl for evaluation."
       (signal 'evalator-error (list error-str out-str)))))
 
 (defun evalator-context-cider-init ()
-  ""
+  "See slot documentation in evalator-context.el in evalator package."
   (if cider-mode
       (progn
         (evalator-context-cider-inject)
         (evalator-context-cider-require)
-        (evalator-context-cider-swap-special-arg))
+        (evalator-context-cider-swap-special-arg (evalator-context-get-special-arg evalator-context-cider)))
     (progn
       (message (concat "CIDER must be running before evalator can be started.\n"
                        "Run 'M-x cider-jack-in' to start a CIDER server for this project and try again."))
