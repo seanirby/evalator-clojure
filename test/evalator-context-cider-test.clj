@@ -1,6 +1,6 @@
-(load-file "evalator-context-cider.clj")
 (ns evalator-context-cider-test.core)
 (refer 'clojure.test)
+(load-file "../evalator-context-cider.clj")
 (refer 'evalator-context-cider)
 
 (defn special-arg-fixture [f]
