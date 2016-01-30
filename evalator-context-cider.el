@@ -6,7 +6,7 @@
 ;; URL: http://www.github.com/seanirby/evalator-context-cider
 ;; Version: 1.0.0
 ;; Keywords: languages, clojure, cider, helm
-;; Package-Requires: ((cider)(evalator))
+;; Package-Requires: ((cider "0.10.0") (evalator "1.0.0"))
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
