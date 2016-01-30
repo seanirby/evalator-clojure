@@ -1,3 +1,35 @@
+;;; evalator-context-cider.clj --- Clojure backend for CIDER context
+;;
+;; Author: Sean Irby
+;; Copyright © , Sean Irby
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or (at
+;; your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; This file is not a part of GNU Emacs
+;;
+;;; Commentary:
+;;
+;;  This file is required, fully-qualified, in the current namespace
+;;  when an evalator session is started with 'evalator-context-cider'
+;;  as the evaluation context.  CIDER will call these functions as
+;;  needed when a result needs to be generated.
+;;
+;;; Code:
+
+
 (ns evalator-context-cider
   (:require [clojure.string :as s :refer [replace join]]))
 
@@ -76,3 +108,5 @@
         (list (eval-expression (subst-special-args expr-str (mapv read-string cands-v))))
         (map #(eval-expression (subst-special-args expr-str (read-string %))) cands-v)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; evalator-context-cider.clj ends here
