@@ -15,11 +15,17 @@ To use Clojure as your evaluation context you need to set the var ```evalator-co
 Evalator uses an Elisp evaluation context by default, but if the var ```evalator-context-to-use``` is set, then its value is used instead.  I recommend defining a hook so that this var is given a buffer-local value in buffers where ```clojure-mode``` is on.  This way, Elisp remains the default context except when you're working in a Clojure buffer.  If this is what you want then add the following to your init file:
 
 ```
+(require 'evalator)
+(require 'evalator-context-cider)
+
 (add-hook 'clojure-mode-hook (lambda () (setq-local evalator-context-to-use evalator-context-cider))
 ```
 
 If you'd like to use clojure as your evaluation context in all buffers, then add the following.
 ```
+(require 'evalator)
+(require 'evalator-context-cider)
+
 (setq evalator-context-to-use evalator-context-cider)
 
 ```
