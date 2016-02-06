@@ -5,8 +5,8 @@
 
 (files "*.el" "*clj")
 
-(depends-on "cider")
-(depends-on "evalator")
+(depends-on "cider" "0.10.0")
+(depends-on "evalator" "1.0.0")
 
 (development
  (depends-on "f")
