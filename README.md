@@ -1,8 +1,10 @@
-# EVALATOR-CONTEXT-CIDER #
+# EVALATOR-CLOJURE #
 
-```evalator-context-cider``` is an Emacs package that provides Clojure support for [Evalator](https://github.com/seanirby/evalator) via [CIDER](https://github.com/clojure-emacs/cider).
+```evalator-clojure``` is an Emacs package that provides Clojure
+support for [Evalator](https://github.com/seanirby/evalator) via
+[CIDER](https://github.com/clojure-emacs/cider).
 
-By installing this package you can use Clojure as your evaluation context in evalator sessions.  See [here](https://github.com/seanirby/evalator) for details.
+See [here](https://github.com/seanirby/evalator) for details.
 
 ## Installation ##
 
@@ -10,29 +12,46 @@ UPDATE WHEN ADDED TO MELPA
 
 ## Setup ##
 
-To use Clojure as your evaluation context you need to set the var ```evalator-context-to-use``` to ```evalator-context-cider```.
-
-Evalator uses an Elisp evaluation context by default, but if the var ```evalator-context-to-use``` is set, then its value is used instead.  I recommend defining a hook so that this var is given a buffer-local value in buffers where ```clojure-mode``` is on.  This way, Elisp remains the default context except when you're working in a Clojure buffer.  If this is what you want then add the following to your init file:
+The recommended setup uses one group of key bindings, and sets the
+```evalator-config-mode-context-alist``` var such that whenever a
+command is called to start an evalator session in a buffer where
+```clojure-mode``` is enabled, evalator will start with
+```evalator-clojure-context``` as its evaluation context.
 
 ```
-(require 'evalator)
-(require 'evalator-context-cider)
+(global-set-key (kbd "C-c e e") 'evalator)
+(global-set-key (kbd "C-c e x") 'evalator-explicit)
+(global-set-key (kbd "C-c e r") 'evalator-resume)
+(global-set-key (kbd "C-c e i") 'evalator-insert-equiv-expr)
 
-(add-hook 'clojure-mode-hook (lambda () (setq-local evalator-context-to-use evalator-context-cider))
+(setq evalator-config-mode-context-alist nil)
+(add-to-list 'evalator-config-mode-context-alist '(clojure-mode . evalator-clojure-context))
+``` 
+
+See
+[here](https://github.com/seanirby/evalator#setup-auto-detect-context)
+for more information on configuring context auto detection.
+
+If you just want to provide new key bindings such that they don't interfere with
+your existing ```evalator``` key bindings then do the following:
+
 ```
-
-If you'd like to use clojure as your evaluation context in all buffers, then add the following.
-```
-(require 'evalator)
-(require 'evalator-context-cider)
-
-(setq evalator-context-to-use evalator-context-cider)
-
+(global-set-key (kbd "C-c c e") 'evalator-clojure)
+(global-set-key (kbd "C-c c x") 'evalator-clojure-explicit)
 ```
 
 ## Usage ##
 
-Assuming you've setup the ```evalator-context-to-use``` var appropriately, all you need to do is run the ```evalator``` command.
+This package provides two helper commands that can each be used to
+start an evalator session with a Clojure evaluation context.
 
-**A CIDER server must be running and connected to before you can use ```evalator-context-cider```.**
-You can do this by executing ```cider-jack-in```, which is normally bound to <kbd>C-c M-j</kbd>
+`evalator-clojure' will start evalator in normal mode.
+
+`evalator-clojure-explicit' will start evalator in explicit mode.
+
+**A CIDER server must be running and connected to before you can use
+```evalator-clojure```.** You can do this by executing
+```cider-jack-in```, which is normally bound to <kbd>C-c M-j</kbd>
+
+See the [evalator](https://github.com/seanirby/evalator) repo for more
+details on using evalator.
