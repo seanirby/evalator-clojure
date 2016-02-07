@@ -1,4 +1,4 @@
-;;; evalator-context-cider.clj --- Clojure backend for CIDER context
+;;; evalator-clojure.clj --- Clojure backend for CIDER context.
 ;;
 ;; Author: Sean Irby
 ;; Copyright © , Sean Irby
@@ -23,14 +23,14 @@
 ;;; Commentary:
 ;;
 ;;  This file is required, fully-qualified, in the current namespace
-;;  when an evalator session is started with 'evalator-context-cider'
+;;  when an evalator session is started with 'evalator-clojure'
 ;;  as the evaluation context.  CIDER will call these functions as
 ;;  needed when a result needs to be generated.
 ;;
 ;;; Code:
 
 
-(ns evalator-context-cider
+(ns evalator-clojure
   (:require [clojure.string :as s :refer [replace join]]))
 
 ;; value is swapped when evalator session starts
@@ -109,4 +109,4 @@
         (map #(eval-expression (subst-special-args expr-str (read-string %))) cands-v)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; evalator-context-cider.clj ends here
+;;; evalator-clojure.clj ends here

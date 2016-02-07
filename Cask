@@ -1,7 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package-file "evalator-context-cider.el")
+(package-file "evalator-clojure.el")
 
 (files "*.el" "*clj")
 

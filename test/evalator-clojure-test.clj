@@ -1,7 +1,7 @@
-(ns evalator-context-cider-test.core)
+(ns evalator-clojure-test.core)
 (refer 'clojure.test)
-(load-file "../evalator-context-cider.clj")
-(refer 'evalator-context-cider)
+(load-file "../evalator-clojure.clj")
+(refer 'evalator-clojure)
 
 (defn special-arg-fixture [f]
   ;; @ is easier to type
@@ -56,7 +56,7 @@
         (make-candidates "'(0 1 2)" :normal)))
   (is (= '("(0 1 2)")
         (make-candidates "'(0 1 2)" :explicit)))
-  
+
   ;; Vectors
   (is (= '("0" "1" "2")
         (make-candidates "[0 1 2]" :normal)))
@@ -68,7 +68,7 @@
         (make-candidates "(take 3 (range))" :normal)))
   (is (= '("(0 1 2)")
         (make-candidates "(take 3 (range))" :explicit)))
-  
+
   ;; Hashmaps
   (is (= '("{:foo :bar}")
         (make-candidates "{:foo :bar}" :normal)))
@@ -100,13 +100,3 @@
         (transform-candidates '("0" "1" "2") "(reduce + '@)" true))))
 
 (run-tests)
-
-
-
-
-
-
-
-
-
-
