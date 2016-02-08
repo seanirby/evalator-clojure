@@ -35,13 +35,16 @@
 (setq evalator-clojure-special-arg "Ⓔ")
 
 ;; Used noflet because I couldn't find a way to mock 'cider-nrepl-sync-request:eval' twice
-(ert-deftest evalator-clojure-inject ()
+;; TODO add test for when namespace doesn't need to be loaded
+(ert-deftest evalator-clojure-inject-test ()
   (noflet ((cider-nrepl-sync-request:eval (expr) expr))
           (with-mock
            (stub cider-current-ns => "foo.core")
            (stub evalator-utils-get-file-string => "evalator-clojure.clj contents")
-           (should (equal "(ns foo.core)"
-                          (evalator-clojure-inject))))))
+           (noflet ((nrepl-dict-get (_r _s) "nil"))
+                   (should (equal "(ns foo.core)"
+                                  (evalator-clojure-inject))))
+           )))
 
 (ert-deftest evalator-clojure-require-test ()
   (with-mock
@@ -69,7 +72,7 @@
   (should
    (equal "(evalator-clojure/my-func '(1 2) \"(+ 1 1)\" nil)"
           (evalator-clojure-make-expression-string "my-func"
-                                                         '((1 2) "(+ 1 1)" nil)))))
+                                                   '((1 2) "(+ 1 1)" nil)))))
 
 (ert-deftest evalator-clojure-eval-test ()
   (with-mock
@@ -88,18 +91,18 @@
            (should (evalator-clojure-result-or-error '("err" "error text")))
            (should (evalator-clojure-result-or-error '())))))
 
-(ert-deftest evalator-clojure-init ()
+(ert-deftest evalator-clojure-init-test ()
   (with-mock
    (mock (evalator-context-get-special-arg *) :times 1)
    (mock (evalator-clojure-inject) :times 1)
    (mock (evalator-clojure-require) :times 1)
    (mock (evalator-clojure-swap-special-arg *) :times 1)
-   (let ((cider-mode t))
-     (evalator-clojure-init))
-   (let ((cider-mode nil))
-     (mock (message *))
-     (equal nil
-            (evalator-clojure-init)))))
+   (noflet ((cider-connections () t))
+           (evalator-clojure-init))
+   (noflet ((cider-connections () nil))
+           (mock (message *))
+           (equal nil
+                  (evalator-clojure-init)))))
 
 (ert-deftest evalator-clojure-make-equiv-expr-test ()
   (with-mock
@@ -117,8 +120,8 @@
 (ert-deftest evalator-clojure-transform-candidates-test ()
   (with-mock
    (mock (evalator-clojure-eval "transform-candidates" '(("foo")
-                                                               "(concat Ⓔ \"bar\")"
-                                                               nil)))
+                                                         "(concat Ⓔ \"bar\")"
+                                                         nil)))
    (mock (evalator-clojure-result-or-error *) => t)
    (evalator-clojure-transform-candidates '("foo") "(concat Ⓔ \"bar\")" nil)))
 

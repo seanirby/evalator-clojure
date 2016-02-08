@@ -36,7 +36,7 @@
 ;;
 ;;  `evalator-clojure' will start evalator in normal mode.
 ;;
-;;  `evalator-clojure-explicit' will start evalator in explicit mode.
+;;  `evalator-clojure-explicit' will start evalator in explicit mode
 ;;
 ;;   NOTE:
 ;;   This package uses CIDER to execute Clojure in EMACS so a CIDER
