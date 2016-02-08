@@ -83,15 +83,19 @@
              'evalator-clojure-make-equiv-expr)))))
 
 (defun evalator-clojure-inject ()
-  "Make evalator-clojure namespace available."
-  ;; Remember current ns so it can be switched back to after injection
-  (let* ((ns-curr (cider-current-ns)))
-    (cider-nrepl-sync-request:eval
-     (evalator-utils-get-file-string
-      (expand-file-name "evalator-clojure.clj"
-                        (file-name-directory
-                         (or evalator-clojure-file-name buffer-file-name)))))
-    (cider-nrepl-sync-request:eval (concat "(ns " ns-curr ")"))))
+  "Make evalator-clojure namespace available if not already."
+  (let* (;; Store current namespace so it can be switched back to after injection
+         (ns-curr (cider-current-ns))
+         ;;Check if the evalator-clojure namespace needs to be loaded
+         (result  (cider-nrepl-sync-request:eval (format "(find-ns '%s)" evalator-clojure-ns)))
+         (load-namespace-p (equal "nil" (nrepl-dict-get result "value"))))
+    (when load-namespace-p
+      (cider-nrepl-sync-request:eval
+       (evalator-utils-get-file-string
+        (expand-file-name "evalator-clojure.clj"
+                          (file-name-directory
+                           (or evalator-clojure-file-name buffer-file-name)))))
+      (cider-nrepl-sync-request:eval (concat "(ns " ns-curr ")")))))
 
 (defun evalator-clojure-require ()
   "Requires evalator-clojure-ns in current ns fully-qualified."
